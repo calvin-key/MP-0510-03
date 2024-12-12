@@ -9,8 +9,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Sample {
@@ -20,4 +21,84 @@ model Sample {
   updatedAt DateTime @updatedAt
 
   @@map("samples")
+}
+
+model User {
+  id               Int      @id @default(autoincrement())
+  fullName         String
+  email            String   @unique
+  password         String
+  phoneNumber      Int
+  role             Role
+  profilePicture   String   @default("https://res.cloudinary.com/dwptrdpk0/image/upload/v1733977839/anonymous_ksneos.jpg")
+  referralCode     String   @unique
+  pointsBalance    Int
+  pointsExpiryDate DateTime
+  address          String
+  isDeleted        Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  events           Event[]
+
+  @@map("users")
+}
+
+enum Role {
+  ORGANIZER
+  CUSTOMER
+}
+
+model Event {
+  id              Int             @id @default(autoincrement())
+  name            String
+  description     String          @db.Text
+  organizerId     Int
+  user            User            @relation(fields: [userId], references: [id])
+  addressId       Int
+  address         Address         @relation(fields: [addressId], references: [id])
+  startDate       DateTime
+  endDate         DateTime
+  isDeleted       Boolean         @default(false)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  userId          Int
+  eventCategories EventCategory[]
+
+  @@map("events")
+}
+
+model Address {
+  id            Int      @id @default(autoincrement())
+  country       String
+  city          String
+  streetAddress String
+  description   String
+  isDeleted     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  events        Event[]
+
+  @@map("addresses")
+}
+
+model Category {
+  id              Int             @id @default(autoincrement())
+  name            String
+  description     String
+  isDeleted       Boolean         @default(false)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  eventCategories EventCategory[]
+
+  @@map("categories")
+}
+
+model EventCategory {
+  id         Int      @id @default(autoincrement())
+  eventId    Int
+  categoryId Int
+  event      Event    @relation(fields: [eventId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  @@map("event_categories")
 }
