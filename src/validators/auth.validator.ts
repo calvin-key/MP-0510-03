@@ -33,3 +33,18 @@ export const validateLogin = [
     next();
   },
 ];
+
+export const validateForgotPassword = [
+  body("email").notEmpty().withMessage("Email is required").isEmail(),
+
+  (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      res.status(400).send({ message: errors.array()[0].msg });
+      return;
+    }
+
+    next();
+  },
+];
