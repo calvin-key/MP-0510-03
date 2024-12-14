@@ -9,3 +9,4 @@ export const SUPABASE_PASSWORD = process.env.SUPABASE_PASSWORD;
 export const SUPABASE_DATABASE = process.env.SUPABASE_DATABASE;
 export const SUPABASE_PORT = Number(process.env.SUPABASE_PORT);
 export const BASE_URL_FE = process.env.BASE_URL_FE;
+export const JWT_SECRET = process.env.JWT_SECRET;
