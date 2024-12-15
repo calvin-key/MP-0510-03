@@ -17,7 +17,8 @@ export const registerService = async (body: User) => {
     const role = "CUSTOMER";
     const pointsBalance = 0;
     const phoneNumber = 0;
-    const referralCode = "";
+    const referralCode =
+      "REF" + Math.random().toString(36).substring(2, 8).toUpperCase();
     const pointsExpiryDate = new Date();
     const address = "";
 
