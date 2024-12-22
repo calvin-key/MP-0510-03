@@ -8,7 +8,7 @@ interface CreateEventBody {
   specificLocation: string;
   startDate: string;
   endDate: string;
-  city: string; 
+  city: string;
   categories: string[];
   ticketTypes: { ticketType: string; price: number; availableSeats: number }[];
 }

@@ -39,7 +39,7 @@ export const createEventController = async (
 
     const event = await createEventService(
       req.body,
-      files.image?.[0], 
+      files.image?.[0],
       1
       // res.locals.user.id // User ID from token
     );
