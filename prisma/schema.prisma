@@ -24,21 +24,25 @@ model Sample {
 }
 
 model User {
-  id               Int      @id @default(autoincrement())
-  fullName         String
-  email            String   @unique
-  password         String
-  phoneNumber      Int
-  role             Role
-  profilePicture   String   @default("https://res.cloudinary.com/dwptrdpk0/image/upload/v1733977839/anonymous_ksneos.jpg")
-  referralCode     String   @unique
-  pointsBalance    Int
-  pointsExpiryDate DateTime
-  address          String
-  isDeleted        Boolean  @default(false)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  events           Event[]
+  id                Int               @id @default(autoincrement())
+  fullName          String
+  email             String            @unique
+  password          String
+  phoneNumber       Int
+  role              Role
+  profilePicture    String?           @default("https://res.cloudinary.com/dwptrdpk0/image/upload/v1733977839/anonymous_ksneos.jpg")
+  referralCode      String            @unique
+  pointsBalance     Int
+  pointsExpiryDate  DateTime
+  address           String?
+  isDeleted         Boolean           @default(false)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  events            Event[]
+  referralHistories RefferalHistory[] @relation("Referrer")
+  referredBy        RefferalHistory[] @relation("Referred")
+  userCoupons       UserCoupon[]
+  points            Point[]           @relation("UserPoints")
 
   @@map("users")
 }
@@ -48,12 +52,62 @@ enum Role {
   CUSTOMER
 }
 
+model Point {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  points    Int
+  expiredAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation("UserPoints", fields: [userId], references: [id])
+
+  @@map("points")
+}
+
+model RefferalHistory {
+  id            Int      @id @default(autoincrement())
+  referrerId    Int
+  referredId    Int
+  pointsAwarded Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  referrer User @relation("Referrer", fields: [referrerId], references: [id])
+  referred User @relation("Referred", fields: [referredId], references: [id])
+
+  @@map("referral_histories")
+}
+
+model UserCoupon {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  couponId  Int
+  isUsed    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id])
+  coupon Coupon @relation(fields: [couponId], references: [id])
+
+  @@map("user_coupons")
+}
+
+model Coupon {
+  id          Int          @id @default(autoincrement())
+  code        String       @unique
+  nominal     Int
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  userCoupons UserCoupon[]
+
+  @@map("coupons")
+}
+
 model Event {
   id              Int             @id @default(autoincrement())
   name            String
   description     String          @db.Text
   organizerId     Int
-  user            User            @relation(fields: [userId], references: [id])
+  organizer       User            @relation(fields: [userId], references: [id])
   addressId       Int
   address         Address         @relation(fields: [addressId], references: [id])
   startDate       DateTime
