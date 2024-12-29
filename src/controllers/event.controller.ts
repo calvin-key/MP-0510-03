@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { getEventsService } from "../services/event/get-events.service";
 import { createEventService } from "../services/event/create-event.service";
+import { getEventService } from "../services/event/get-event.service";
 
 export const getEventsController = async (
   req: Request,
@@ -19,6 +20,20 @@ export const getEventsController = async (
     };
 
     const result = await getEventsService(query);
+    res.status(200).send(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getEventController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const id = Number(req.params.id);
+    const result = await getEventService(id);
     res.status(200).send(result);
   } catch (error) {
     next(error);

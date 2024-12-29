@@ -41,7 +41,7 @@ export const getEventsService = async (query: GetEventsQuery) => {
       orderBy: { [sortBy]: sortOrder },
       include: {
         organizer: { select: { fullName: true } },
-        eventCategories: { include: { category: { select: { name: true } } } },
+        eventCategories: { select: { category: { select: { name: true } } } },
         ticketTypes: { select: { price: true } },
       },
     });
