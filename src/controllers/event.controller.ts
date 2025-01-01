@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import { getEventsService } from "../services/event/get-events.service";
 import { createEventService } from "../services/event/create-event.service";
 import { getEventService } from "../services/event/get-event.service";
+import { getEventsService } from "../services/event/get-events.service";
+import { getOrganizerEventsService } from "../services/event/get-organizer-events.service";
 
 export const getEventsController = async (
   req: Request,
@@ -25,6 +26,28 @@ export const getEventsController = async (
     next(error);
   }
 };
+
+export const getOrganizerEventsController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    // const organizerId = res.locals.id; // Replace with auth logic later
+    const organizerId = 1; 
+
+    if (!organizerId) {
+      res.status(403).send({ error: "Unauthorized access" });
+      return;
+    }
+
+    const result = await getOrganizerEventsService(organizerId);
+    res.status(200).send(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
 
 export const getEventController = async (
   req: Request,
