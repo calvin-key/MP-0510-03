@@ -4,8 +4,8 @@ import cors from "cors";
 import sampleRouter from "./routes/sample.router";
 import eventRouter from "./routes/event.router";
 import authRouter from "./routes/auth.router";
-import dashboardRouter from "./routes/dashboard.router";
-import voucherRouter from "./routes/voucher.router";
+import userRouter from "./routes/user.router";
+import eventCategoryRouter from "./routes/event-category.router";
 
 const app = express();
 
@@ -14,10 +14,10 @@ app.use(express.json());
 
 //routes
 app.use("/samples", sampleRouter);
-app.use("/events", eventRouter);
 app.use("/auth", authRouter);
-app.use("/dashboard", dashboardRouter);
-app.use("/voucher", voucherRouter);
+app.use("/users", userRouter);
+app.use("/events", eventRouter);
+app.use("/event-categories", eventCategoryRouter);
 
 // middleware error
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
