@@ -9,8 +9,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
   // directUrl = env("DIRECT_URL")
 }
 
@@ -43,6 +43,7 @@ model User {
   referralHistories RefferalHistory[] @relation("Referrer")
   referredBy        RefferalHistory[] @relation("Referred")
   userCoupons       UserCoupon[]
+  voucherUsage      VoucherUsage[]
 
   @@map("users")
 }
@@ -174,18 +175,33 @@ model TicketType {
 }
 
 model Voucher {
-  id          Int      @id @default(autoincrement())
-  code        String
+  id          Int            @id @default(autoincrement())
+  code        String         @unique
   description String
   nominal     Int
   quantity    Int
+  usageCount  Int            @default(0)
   eventId     Int
-  event       Event    @relation(fields: [eventId], references: [id])
+  event       Event          @relation(fields: [eventId], references: [id])
   startAt     DateTime
   expiresAt   DateTime
-  isDeleted   Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  isDeleted   Boolean        @default(false)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  usedBy      VoucherUsage[]
 
   @@map("vouchers")
+}
+
+model VoucherUsage {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  voucherId Int
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  voucher Voucher @relation(fields: [voucherId], references: [id])
+
+  @@unique([userId, voucherId])
+  @@map("voucher_usages")
 }
