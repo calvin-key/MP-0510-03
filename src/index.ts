@@ -5,6 +5,8 @@ import sampleRouter from "./routes/sample.router";
 import eventRouter from "./routes/event.router";
 import authRouter from "./routes/auth.router";
 import voucherRouter from "./routes/voucher.router";
+import transactionRouter from "./routes/transaction.router";
+import "./lib/cronJob";
 
 const app = express();
 
@@ -15,7 +17,8 @@ app.use(express.json());
 app.use("/samples", sampleRouter);
 app.use("/events", eventRouter);
 app.use("/auth", authRouter);
-app.use("/vouchers", voucherRouter)
+app.use("/vouchers", voucherRouter);
+app.use("/transactions", transactionRouter);
 
 // middleware error
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

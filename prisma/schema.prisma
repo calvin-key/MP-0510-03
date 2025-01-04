@@ -35,15 +35,17 @@ model User {
   pointsBalance     Int
   pointsExpiryDate  DateTime
   address           String?
+  bankAccount       String?
   isDeleted         Boolean           @default(false)
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
   events            Event[]
   points            Point[]           @relation("UserPoints")
-  referralHistories RefferalHistory[] @relation("Referrer")
-  referredBy        RefferalHistory[] @relation("Referred")
+  referralHistories ReferralHistory[] @relation("Referrer")
+  referredBy        ReferralHistory[] @relation("Referred")
   userCoupons       UserCoupon[]
   voucherUsage      VoucherUsage[]
+  transactions      Transaction[]
 
   @@map("users")
 }
@@ -64,7 +66,7 @@ model Point {
   @@map("points")
 }
 
-model RefferalHistory {
+model ReferralHistory {
   id            Int      @id @default(autoincrement())
   referrerId    Int
   referredId    Int
@@ -89,16 +91,19 @@ model UserCoupon {
   user   User   @relation(fields: [userId], references: [id])
   coupon Coupon @relation(fields: [couponId], references: [id])
 
+  @@unique([userId, couponId])
   @@map("user_coupons")
 }
 
 model Coupon {
-  id          Int          @id @default(autoincrement())
-  code        String       @unique
-  nominal     Int
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  userCoupons UserCoupon[]
+  id           Int           @id @default(autoincrement())
+  code         String        @unique
+  nominal      Int
+  expiredAt    DateTime      @default(now())
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  userCoupons  UserCoupon[]
+  transactions Transaction[]
 
   @@map("coupons")
 }
@@ -161,34 +166,37 @@ model EventCategory {
 }
 
 model TicketType {
-  id             Int      @id @default(autoincrement())
-  ticketType     String
-  price          Int
-  availableSeats Int
-  eventId        Int
-  event          Event    @relation(fields: [eventId], references: [id])
-  isDeleted      Boolean  @default(false)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id               Int               @id @default(autoincrement())
+  ticketType       String
+  price            Int
+  availableSeats   Int
+  eventId          Int
+  event            Event             @relation(fields: [eventId], references: [id])
+  isDeleted        Boolean           @default(false)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  transactions     Transaction[]
+  transactionItems TransactionItem[]
 
   @@map("ticket_types")
 }
 
 model Voucher {
-  id          Int            @id @default(autoincrement())
-  code        String         @unique
-  description String
-  nominal     Int
-  quantity    Int
-  usageCount  Int            @default(0)
-  eventId     Int
-  event       Event          @relation(fields: [eventId], references: [id])
-  startAt     DateTime
-  expiresAt   DateTime
-  isDeleted   Boolean        @default(false)
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-  usedBy      VoucherUsage[]
+  id           Int            @id @default(autoincrement())
+  code         String         @unique
+  description  String
+  nominal      Int
+  quantity     Int
+  usageCount   Int            @default(0)
+  eventId      Int
+  event        Event          @relation(fields: [eventId], references: [id])
+  startAt      DateTime
+  expiresAt    DateTime
+  isDeleted    Boolean        @default(false)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  usedBy       VoucherUsage[]
+  transactions Transaction[]
 
   @@map("vouchers")
 }
@@ -204,4 +212,53 @@ model VoucherUsage {
 
   @@unique([userId, voucherId])
   @@map("voucher_usages")
+}
+
+model Transaction {
+  id           Int               @id @default(autoincrement())
+  userId       Int
+  pointsUsed   Int               @default(0)
+  voucherId    Int?
+  couponId     Int?
+  totalPrice   Int
+  status       TransactionStatus @default(waiting_for_payment)
+  paymentProof String?
+  expiresAt    DateTime
+  confirmedAt  DateTime?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  user         User              @relation(fields: [userId], references: [id])
+  voucher      Voucher?          @relation(fields: [voucherId], references: [id])
+  coupon       Coupon?           @relation(fields: [couponId], references: [id]) // Add this
+  items        TransactionItem[]
+  TicketType   TicketType?       @relation(fields: [ticketTypeId], references: [id])
+  ticketTypeId Int?
+
+  @@map("transactions")
+}
+
+model TransactionItem {
+  id            Int      @id @default(autoincrement())
+  transactionId Int
+  ticketTypeId  Int
+  quantity      Int
+  pricePerUnit  Int
+  subtotal      Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  transaction Transaction @relation(fields: [transactionId], references: [id])
+  ticketType  TicketType  @relation(fields: [ticketTypeId], references: [id])
+
+  @@map("transaction_items")
+}
+
+enum TransactionStatus {
+  waiting_for_payment
+  waiting_for_admin_confirmation
+  done
+  rejected
+  expired
+  canceled
 }

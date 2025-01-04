@@ -12,6 +12,7 @@ export const loginService = async (body: Body) => {
 
     const user = await prisma.user.findFirst({
       where: { email: email },
+      include: { voucherUsage: true },
     });
 
     if (!user) {
