@@ -1,25 +1,35 @@
-import express from "express";
+import { Router } from "express";
 import {
+  changePasswordController,
+  getReferredByController,
+  getReferredUsersController,
   getUserController,
-  getUsersController,
   updateUserController,
 } from "../controllers/user.controller";
 import { fileFilter } from "../lib/fileFilter";
-import { verifyToken } from "../lib/jwt";
 import { uploader } from "../lib/multer";
-import { validateUpdateUser } from "../validators/user.validator";
+import { verifyToken } from "../lib/jwt";
+import { validateChangePassword } from "../validators/user.validator";
 
-const router = express.Router();
+const router = Router();
 
-router.get("/", getUsersController);
-router.get("/:id", getUserController);
+router.get("/referrals", verifyToken, getReferredUsersController);
+router.get("/referrals/by", verifyToken, getReferredByController);
+router.get("/profile", verifyToken, getUserController);
+
 router.patch(
-  "/:id",
+  "/",
   verifyToken,
-  uploader().single("profilePicture"),
+  uploader(1).fields([{ name: "profilePicture", maxCount: 1 }]),
   fileFilter,
-  validateUpdateUser,
   updateUserController
+);
+
+router.patch(
+  "/change-password",
+  verifyToken,
+  validateChangePassword,
+  changePasswordController
 );
 
 export default router;

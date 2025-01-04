@@ -1,63 +1,44 @@
+import { User } from "@prisma/client";
+import { hashPassword } from "../../lib/argon";
 import { cloudinaryUpload, cloudinaryRemove } from "../../lib/cloudinary";
 import { prisma } from "../../lib/prisma";
-import { Role } from "@prisma/client";
 
 interface UpdateUserBody {
-  fullName?: string;
-  email?: string;
-  phoneNumber?: string;
-  address?: string;
-  profilePicture?: Express.Multer.File;
-  role?: Role;
+  fullName: string;
 }
 
-export const updateUserService = async (id: number, body: UpdateUserBody) => {
+export const updateUserService = async (
+  body: UpdateUserBody,
+  profilePicture: Express.Multer.File | undefined,
+  id: number
+) => {
   try {
-    const { fullName, email, phoneNumber, address, profilePicture, role } =
-      body;
+    console.log(body, profilePicture, id);
 
-    if (role && !Object.values(Role).includes(role)) {
-      throw new Error("Invalid role");
-    }
-
-    if (email) {
-      const existingUser = await prisma.user.findFirst({
-        where: { email, id: { not: id } },
-      });
-
-      if (existingUser) {
-        throw new Error("Email already in use!");
-      }
-    }
-
-    const currentUser = await prisma.user.findUnique({
+    const user = await prisma.user.findFirst({
       where: { id },
     });
 
-    if (!currentUser) {
-      throw new Error("User not found");
+    if (!user) {
+      throw new Error("Invalid user id");
     }
 
-    let profilePictureUrl = currentUser.profilePicture;
+    let secure_url: string | undefined;
     if (profilePicture) {
-      if (currentUser.profilePicture) {
-        await cloudinaryRemove(currentUser.profilePicture);
+      if (user.profilePicture !== null) {
+        await cloudinaryRemove(user.profilePicture);
       }
-      const { secure_url } = await cloudinaryUpload(profilePicture);
-      profilePictureUrl = secure_url;
+
+      const uploadResult = await cloudinaryUpload(profilePicture);
+      secure_url = uploadResult.secure_url;
     }
 
-    return await prisma.user.update({
+    await prisma.user.update({
       where: { id },
-      data: {
-        fullName,
-        email,
-        phoneNumber,
-        address,
-        profilePicture: profilePictureUrl,
-        role,
-      },
+      data: secure_url ? { ...body, profilePicture: secure_url } : body,
     });
+
+    return { message: "Update profile success" };
   } catch (error) {
     throw error;
   }

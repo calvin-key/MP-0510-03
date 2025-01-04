@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { body, validationResult } from "express-validator";
 
-export const validateChangePassword = [
-  body("password").notEmpty().withMessage("Password is required"),
-  body("newPassword").notEmpty().withMessage("New Password is required"),
+export const validateCreateReferral = [
+  body("referrerUserId").notEmpty().withMessage("Referrer ID is required"),
+  body("refereeUserId").notEmpty().withMessage("Referee ID is required"),
 
   (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);

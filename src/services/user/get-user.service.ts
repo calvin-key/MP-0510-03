@@ -2,11 +2,17 @@ import { prisma } from "../../lib/prisma";
 
 export const getUserService = async (id: number) => {
   try {
-    const user = await prisma.user.findUnique({ where: { id } });
-    if (!user || user.isDeleted) {
-      throw new Error(`User with id ${id} not found`);
+    const user = await prisma.user.findFirst({
+      where: { id },
+    });
+
+    if (!user) {
+      throw new Error("Invalid user id");
     }
-    return user;
+
+    const { password: pass, ...userWithoutPassword } = user;
+
+    return { ...userWithoutPassword };
   } catch (error) {
     throw error;
   }
