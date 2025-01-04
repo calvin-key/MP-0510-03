@@ -45,7 +45,7 @@ export const registerService = async (body: RegisterInput) => {
       });
 
       if (!referrer) {
-        throw new Error("Kode referral tidak valid!");
+        throw new Error("Invalid referral code!");
       }
     }
 
@@ -69,7 +69,7 @@ export const registerService = async (body: RegisterInput) => {
     });
 
     if (referrer) {
-      await prisma.refferalHistory.create({
+      await prisma.referralHistory.create({
         data: {
           referrerId: referrer.id,
           referredId: newUser.id,

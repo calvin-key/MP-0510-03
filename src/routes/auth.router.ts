@@ -5,13 +5,13 @@ import {
   registerController,
   resetPasswordController,
 } from "../controllers/auth.controller";
+import { verifyTokenReset } from "../lib/jwt";
 import {
   validateForgotPassword,
   validateLogin,
   validateRegister,
   validateResetPassword,
 } from "../validators/auth.validator";
-import { verifyTokenReset } from "../lib/jwt";
 
 const router = Router();
 
