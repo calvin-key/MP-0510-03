@@ -33,8 +33,8 @@ export const getOrganizerEventsController = async (
   next: NextFunction
 ) => {
   try {
-    // const organizerId = res.locals.id; // Replace with auth logic later
-    const organizerId = 1; 
+    // const organizerId = res.locals.id;
+    const organizerId = 1;
 
     if (!organizerId) {
       res.status(403).send({ error: "Unauthorized access" });
@@ -47,7 +47,6 @@ export const getOrganizerEventsController = async (
     next(error);
   }
 };
-
 
 export const getEventController = async (
   req: Request,

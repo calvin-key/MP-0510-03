@@ -9,9 +9,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-  // directUrl = env("DIRECT_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Sample {
@@ -43,6 +43,8 @@ model User {
   points            Point[]           @relation("UserPoints")
   referralHistories ReferralHistory[] @relation("Referrer")
   referredBy        ReferralHistory[] @relation("Referred")
+  referralHistories ReferralHistory[] @relation("Referrer")
+  referredBy        ReferralHistory[] @relation("Referred")
   userCoupons       UserCoupon[]
   voucherUsage      VoucherUsage[]
   transactions      Transaction[]
@@ -66,6 +68,7 @@ model Point {
   @@map("points")
 }
 
+model ReferralHistory {
 model ReferralHistory {
   id            Int      @id @default(autoincrement())
   referrerId    Int
@@ -96,12 +99,15 @@ model UserCoupon {
 }
 
 model Coupon {
-  id           Int           @id @default(autoincrement())
-  code         String        @unique
-  nominal      Int
+  id         Int       @id @default(autoincrement())
+  code       String    @unique
+  nominal    Int
   expiredAt    DateTime      @default(now())
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  expiredAt DateTime @default(now())
+  isUsed    Boolean  @default(false)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
   userCoupons  UserCoupon[]
   transactions Transaction[]
 
@@ -115,6 +121,7 @@ model Event {
   description      String          @db.Text
   organizer        User            @relation(fields: [userId], references: [id])
   address          String
+  bankAccount      String?
   specificLocation String
   locationId       Int
   location         Location        @relation(fields: [locationId], references: [id])
