@@ -3,6 +3,7 @@ import { createEventService } from "../services/event/create-event.service";
 import { getEventService } from "../services/event/get-event.service";
 import { getEventsService } from "../services/event/get-events.service";
 import { getOrganizerEventsService } from "../services/event/get-organizer-events.service";
+import { getReviewableEventsService } from "../services/event/get-reviewable-events.service";
 
 export const getEventsController = async (
   req: Request,
@@ -33,8 +34,7 @@ export const getOrganizerEventsController = async (
   next: NextFunction
 ) => {
   try {
-    // const organizerId = res.locals.id;
-    const organizerId = 1;
+    const organizerId = Number(res.locals.user.id);
 
     if (!organizerId) {
       res.status(403).send({ error: "Unauthorized access" });
@@ -43,6 +43,21 @@ export const getOrganizerEventsController = async (
 
     const result = await getOrganizerEventsService(organizerId);
     res.status(200).send(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getReviewableEventsController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = Number(res.locals.user.id);
+    const events = await getReviewableEventsService(userId);
+
+    res.status(200).send(events);
   } catch (error) {
     next(error);
   }
@@ -77,8 +92,7 @@ export const createEventController = async (
     const event = await createEventService(
       req.body,
       files.image?.[0],
-      1
-      // res.locals.user.id // User ID from token
+      Number(res.locals.user.id)
     );
 
     res.status(200).send(event);

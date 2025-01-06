@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { updateTransactionService } from "../services/transaction/update-transaction.service";
 import { createTransactionService } from "../services/transaction/create-transaction.service";
 import { getTransactionService } from "../services/transaction/get-transaction.service";
+import { getUserTransactionsService } from "../services/transaction/get-user-transactions.service";
 
 export const getTransactionController = async (
   req: Request,
@@ -12,6 +13,20 @@ export const getTransactionController = async (
     const id = Number(req.params.id);
     const result = await getTransactionService(id);
     res.status(200).send(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getUserTransactionsController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const userId = Number(res.locals.user.id);
+    const transactions = await getUserTransactionsService(userId);
+    res.status(200).send(transactions);
   } catch (error) {
     next(error);
   }

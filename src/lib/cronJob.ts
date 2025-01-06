@@ -109,7 +109,12 @@ const checkExpiredTransactions = async () => {
   }
 };
 
-cron.schedule("*/5 * * * *", () => {
+cron.schedule("*/5 * * * *", async () => {
   console.log("Running transaction cleanup cron job...");
-  checkExpiredTransactions();
+  try {
+    await checkExpiredTransactions();
+    console.log("Transaction cleanup completed successfully.");
+  } catch (error) {
+    console.error("Error during transaction cleanup:", error);
+  }
 });
