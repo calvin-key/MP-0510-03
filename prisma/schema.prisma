@@ -97,7 +97,7 @@ model Coupon {
   id        Int      @id @default(autoincrement())
   code      String   @unique
   nominal   Int
-  expiredAt DateTime @default(now())
+  expiredAt DateTime
   isUsed    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
