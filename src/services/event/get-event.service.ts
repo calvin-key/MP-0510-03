@@ -10,7 +10,8 @@ export const getEventService = async (id: number) => {
         },
         location: { select: { city: true } },
         eventCategories: { select: { category: { select: { name: true } } } },
-        ticketTypes: { select: { ticketType: true, price: true } },
+        ticketTypes: true,
+        vouchers: true,
       },
     });
 

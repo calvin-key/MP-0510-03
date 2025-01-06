@@ -3,8 +3,7 @@ import { createVoucherService } from "../services/voucher/create-voucher.service
 
 export const createVoucherController = async (req: Request, res: Response) => {
   try {
-    // const organizerId = res.locals.user.id; // Extracted from JWT
-    const organizerId = 1;
+    const organizerId = Number(res.locals.user.id);
     const voucher = await createVoucherService(organizerId, req.body);
 
     res.status(201).json({ message: "Voucher created successfully.", voucher });

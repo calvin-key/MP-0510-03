@@ -3,6 +3,7 @@ import { createCouponService } from "../services/coupon/create-coupon.service";
 import { getCouponsService } from "../services/coupon/get-coupons.service";
 import { updateCouponService } from "../services/coupon/update-coupon.service";
 import { getCouponService } from "../services/coupon/get-coupon.service";
+import { validateCouponService } from "../services/coupon/validate-coupon.service";
 
 export const getCouponsController = async (
   req: Request,
@@ -58,6 +59,23 @@ export const updateCouponController = async (
     const { id } = req.params;
     const result = await updateCouponService(req.body, parseInt(id));
     res.status(200).send(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const validateCouponController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { code } = req.body;
+    const userId = Number(res.locals.user.id);
+
+    const coupon = await validateCouponService(code, userId);
+
+    res.status(200).send(coupon);
   } catch (error) {
     next(error);
   }
