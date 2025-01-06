@@ -4,7 +4,6 @@ import { verifyToken } from "../lib/jwt";
 
 const router = express.Router();
 
-// router.post("/", verifyToken, createVoucherController);
-router.post("/", createVoucherController);
+router.post("/", verifyToken, createVoucherController);
 
 export default router;
