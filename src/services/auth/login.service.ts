@@ -11,8 +11,7 @@ export const loginService = async (body: Body) => {
     const { email, password } = body;
 
     const user = await prisma.user.findFirst({
-      where: { email: email },
-      include: { voucherUsage: true },
+      where: { email },
     });
 
     if (!user) {

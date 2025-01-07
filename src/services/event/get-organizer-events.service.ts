@@ -8,7 +8,6 @@ export const getOrganizerEventsService = async (organizerId: number) => {
         isDeleted: false,
         endDate: { gte: new Date() },
       },
-      select: { name: true, id: true },
     });
 
     if (!events) {

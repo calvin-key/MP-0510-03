@@ -9,9 +9,11 @@ import transactionRouter from "./routes/transaction.router";
 import "./lib/cronJob";
 import userRouter from "./routes/user.router";
 import eventCategoryRouter from "./routes/event-category.router";
-import couponRouter from "./routes/coupon.router";
-import referralRouter from "./routes/referral.router";
 import reviewRouter from "./routes/review.router";
+import couponRouter from "./routes/coupon.router";
+import statisticRouter from "./routes/statistic.router";
+import updateTransactionStatusRouter from "./routes/update-transaction-status.router";
+import attendeeRouter from "./routes/attendee.router";
 
 const app = express();
 
@@ -27,9 +29,11 @@ app.use("/auth", authRouter);
 app.use("/vouchers", voucherRouter);
 app.use("/transactions", transactionRouter);
 app.use("/event-categories", eventCategoryRouter);
-app.use("/coupons", couponRouter);
-app.use("/referrals", referralRouter);
 app.use("/reviews", reviewRouter);
+app.use("/coupons", couponRouter);
+app.use("/statistic", statisticRouter);
+app.use("/update-transaction-status", updateTransactionStatusRouter);
+app.use("/attendees", attendeeRouter);
 
 // middleware error
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

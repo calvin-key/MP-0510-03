@@ -4,6 +4,7 @@ import { getEventService } from "../services/event/get-event.service";
 import { getEventsService } from "../services/event/get-events.service";
 import { getOrganizerEventsService } from "../services/event/get-organizer-events.service";
 import { getReviewableEventsService } from "../services/event/get-reviewable-events.service";
+import { editEventService } from "../services/event/edit-event.service";
 
 export const getEventsController = async (
   req: Request,
@@ -96,6 +97,25 @@ export const createEventController = async (
     );
 
     res.status(200).send(event);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const editEventController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const files = req.files as { [fieldName: string]: Express.Multer.File[] };
+    const result = await editEventService(
+      req.body,
+      files.image?.[0],
+      res.locals.user.id,
+      Number(req.params.id)
+    );
+    res.status(200).send(result);
   } catch (error) {
     next(error);
   }
