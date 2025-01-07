@@ -19,7 +19,7 @@ export const verifyToken = (
   verify(token, JWT_SECRET!, (err, payload) => {
     if (err) {
       if (err instanceof TokenExpiredError) {
-        res.status(401).send({ message: "Token Expoired" });
+        res.status(401).send({ message: "Token Expired" });
         return;
       } else {
         res.status(401).send({ message: "Invalid Token" });

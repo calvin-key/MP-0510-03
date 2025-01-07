@@ -29,7 +29,7 @@ const loginService = (body) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, password } = body;
         const user = yield prisma_1.prisma.user.findFirst({
-            where: { email: email },
+            where: { email },
         });
         if (!user) {
             throw new Error("Invalid email address!");

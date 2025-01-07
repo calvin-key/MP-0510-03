@@ -1,10 +1,10 @@
+// routes/statistics.routes.ts
 import { Router } from "express";
+import { getTransactionStatisticsController } from "../controllers/statistic.controller";
 import { verifyToken } from "../lib/jwt";
-import { getEventsStatisticsController } from "../controllers/statistic.controller";
 
 const router = Router();
 
-// Only allow organizers to access statistics
-router.get("/", verifyToken, getEventsStatisticsController);
+router.get("/transactions", verifyToken, getTransactionStatisticsController);
 
 export default router;

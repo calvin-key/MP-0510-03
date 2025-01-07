@@ -4,27 +4,9 @@ import { generateReferralCode } from "../../lib/referral";
 import { generateUniqueCouponCode } from "../../lib/coupon";
 import { prisma } from "../../lib/prisma";
 
-interface RegisterInput
-  extends Omit<
-    User,
-    | "id"
-    | "createdAt"
-    | "updatedAt"
-    | "phoneNumber"
-    | "role"
-    | "profilePicture"
-    | "referralCode"
-    | "pointsBalance"
-    | "pointsExpiryDate"
-    | "address"
-    | "isDeleted"
-  > {
-  referralCode?: string;
-}
-
-export const registerService = async (body: RegisterInput) => {
+export const registerService = async (body: User) => {
   try {
-    const { fullName, email, password, referralCode } = body;
+    const { fullName, email, password, referralCode, role } = body;
 
     // Check if email exists
     const existingUser = await prisma.user.findFirst({
@@ -47,6 +29,7 @@ export const registerService = async (body: RegisterInput) => {
 
       if (!referrer) {
         throw new Error("Invalid referral code!");
+        throw new Error("Invalid referral code!");
       }
     }
 
@@ -64,7 +47,7 @@ export const registerService = async (body: RegisterInput) => {
         email,
         password: hashedPassword,
         referralCode: userReferralCode,
-        role: "CUSTOMER",
+        role,
         phoneNumber: "",
         pointsBalance: 0,
         pointsExpiryDate,

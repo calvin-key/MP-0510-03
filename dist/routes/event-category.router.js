@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const event_category_controller_1 = require("../controllers/event-category.controller");
+const jwt_1 = require("../lib/jwt");
+const event_category_validator_1 = require("../validators/event-category.validator");
+const eventCategoryRouter = (0, express_1.Router)();
+eventCategoryRouter.get("/", event_category_controller_1.getEventCategoriesController);
+eventCategoryRouter.post("/", jwt_1.verifyToken, event_category_validator_1.validateCreateEventCategories, event_category_controller_1.createEventCategoriesController);
+exports.default = eventCategoryRouter;

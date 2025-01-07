@@ -1,41 +1,30 @@
 import { prisma } from "../../lib/prisma";
 
-interface EventStatisticsParams {
+interface TransactionStatisticsParams {
   userId: number;
   year?: string;
   month?: string;
   day?: string;
 }
 
-export const getEventsStatisticsService = async ({
-  userId,
+export const getTransactionStatisticsService = async ({
+  userId, // This is now the organizerId
   year,
   month,
   day,
-}: EventStatisticsParams) => {
+}: TransactionStatisticsParams) => {
   try {
-    // First get all events for this user
-    const userEvents = await prisma.event.findMany({
-      where: {
-        userId,
-        isDeleted: false,
-      },
-      select: { id: true },
-    });
-
-    const eventIds = userEvents.map((event) => event.id);
-
     const filters: any = {
-      AND: [
-        {
-          TicketType: {
-            eventId: {
-              in: eventIds,
+      status: "done",
+      items: {
+        some: {
+          ticketType: {
+            event: {
+              userId: userId, // Filter for events where user is the organizer
             },
           },
         },
-        { status: "done" },
-      ],
+      },
     };
 
     if (year) {
@@ -44,72 +33,69 @@ export const getEventsStatisticsService = async ({
         lt: new Date(`${Number(year) + 1}-01-01`),
       };
     }
+
     if (month) {
       filters.createdAt = {
         gte: new Date(`${year}-${month}-01`),
         lt:
           month === "12"
             ? new Date(`${Number(year) + 1}-01-01`)
-            : new Date(
-                `${year}-${String(Number(month) + 1).padStart(2, "0")}-01`
-              ),
+            : new Date(`${year}-${Number(month) + 1}-01`),
       };
     }
+
     if (day) {
       filters.createdAt = {
         gte: new Date(`${year}-${month}-${day}`),
-        lt: new Date(
-          `${year}-${month}-${String(Number(day) + 1).padStart(2, "0")}`
-        ),
+        lt: new Date(`${year}-${month}-${Number(day) + 1}`),
       };
     }
 
-    const statistics = await prisma.transaction.groupBy({
-      by: ["ticketTypeId"],
-      _count: {
-        id: true,
-      },
-      _sum: {
-        totalPrice: true,
-      },
+    // Get transactions for the organizer's events
+    const transactions = await prisma.transaction.findMany({
       where: filters,
-    });
-
-    // Get ticket types with their events
-    const ticketTypesWithEvents = await prisma.ticketType.findMany({
-      where: {
-        id: {
-          in: statistics
-            .map((stat) => stat.ticketTypeId)
-            .filter((id): id is number => id !== null),
-        },
-        isDeleted: false,
-      },
       include: {
-        event: {
-          select: {
-            id: true,
-            name: true,
-            startDate: true,
+        items: {
+          include: {
+            ticketType: {
+              include: {
+                event: {
+                  select: { name: true },
+                },
+              },
+            },
           },
         },
       },
     });
 
-    const formattedStatistics = ticketTypesWithEvents.map((ticketType) => {
-      const stat = statistics.find((s) => s.ticketTypeId === ticketType.id);
-      return {
-        eventId: ticketType.event.id,
-        eventName: ticketType.event.name,
-        startDate: ticketType.event.startDate,
-        ticketType: ticketType.ticketType,
-        totalTransactions: stat?._count.id || 0,
-        totalRevenue: stat?._sum.totalPrice || 0,
-      };
-    });
+    // Process the data to get statistics
+    const statistics = transactions.reduce((acc: any[], transaction) => {
+      transaction.items.forEach((item) => {
+        const existingEntry = acc.find(
+          (entry) => entry.ticketTypeId === item.ticketTypeId
+        );
 
-    return formattedStatistics;
+        if (existingEntry) {
+          existingEntry.totalTransactions += item.quantity;
+          existingEntry.totalRevenue += item.subtotal;
+        } else {
+          acc.push({
+            ticketTypeId: item.ticketTypeId,
+            eventName: item.ticketType.event.name,
+            ticketType: item.ticketType.ticketType,
+            totalTransactions: item.quantity,
+            totalRevenue: item.subtotal,
+          });
+        }
+      });
+
+      return acc;
+    }, []);
+
+    return statistics;
   } catch (error) {
+    console.error("Error in getTransactionStatisticsService:", error);
     throw error;
   }
 };

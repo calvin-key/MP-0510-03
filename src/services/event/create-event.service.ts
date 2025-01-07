@@ -19,6 +19,7 @@ export const createEventService = async (
   userId: number
 ) => {
   try {
+
     const { name, city, categories, ticketTypes } = body;
 
     const event = await prisma.event.findFirst({

@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { body, validationResult } from "express-validator";
 
 export const validateCreateEventCategories = [
-  body("title").notEmpty().withMessage("Title is required"),
+  body("name").notEmpty().withMessage("Title is required"),
   body("description").notEmpty().withMessage("Description is required"),
 
   (req: Request, res: Response, next: NextFunction) => {
