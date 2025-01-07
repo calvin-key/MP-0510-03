@@ -58,7 +58,7 @@ export const updateTransactionController = async (
     const transactionId = parseInt(req.params.id);
     const files = req.files as { [fieldname: string]: Express.Multer.File[] };
 
-    // Check if paymentProof file exists
+   
     if (!files?.paymentProof?.[0]) {
       res.status(400).json({
         status: "error",

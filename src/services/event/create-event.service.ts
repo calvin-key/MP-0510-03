@@ -19,8 +19,10 @@ export const createEventService = async (
   userId: number
 ) => {
   try {
-
     const { name, city, categories, ticketTypes } = body;
+
+    const startDate = new Date(body.startDate);
+    const endDate = new Date(body.endDate);
 
     const event = await prisma.event.findFirst({
       where: { name, isDeleted: false },
@@ -28,6 +30,11 @@ export const createEventService = async (
 
     if (event) {
       throw new Error("Event with this name already exists.");
+    }
+
+    const now = new Date();
+    if (startDate < now && endDate < now) {
+      throw new Error("Event can't be held in the past");
     }
 
     const location = await prisma.location.findFirst({
@@ -58,8 +65,8 @@ export const createEventService = async (
         description: body.description,
         address: body.address,
         specificLocation: body.specificLocation,
-        startDate: new Date(body.startDate),
-        endDate: new Date(body.endDate),
+        startDate,
+        endDate,
         image: secure_url,
         userId,
         locationId: location.id,

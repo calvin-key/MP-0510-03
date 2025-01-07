@@ -28,7 +28,7 @@ export const validateCreateEvent = [
     })
     .withMessage("Invalid categories format"),
 
-  body("ticketTypes")
+    body("ticketTypes")
     .custom((value) => {
       if (typeof value === "string") {
         const parsed = JSON.parse(value);
@@ -36,10 +36,18 @@ export const validateCreateEvent = [
           throw new Error("Ticket types must be an array");
         }
         parsed.forEach((ticket: any) => {
-          if (!ticket.ticketType || !ticket.price || !ticket.availableSeats) {
+          if (
+            ticket.ticketType === undefined ||
+            ticket.price === undefined ||
+            ticket.availableSeats === undefined
+          ) {
             throw new Error(
               "Each ticket type must include ticketType, price, and availableSeats"
             );
+          }
+  
+          if (typeof ticket.price !== "number" || ticket.price < 0) {
+            throw new Error("Ticket price must be a non-negative number");
           }
         });
       } else if (!Array.isArray(value)) {
@@ -48,6 +56,7 @@ export const validateCreateEvent = [
       return true;
     })
     .withMessage("Invalid ticket types format"),
+  
 
   (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
