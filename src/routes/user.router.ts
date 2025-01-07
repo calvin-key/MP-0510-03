@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   changePasswordController,
+  getOrganizerController,
   getReferredByController,
   getReferredUsersController,
   getUserController,
@@ -16,6 +17,7 @@ const router = Router();
 router.get("/referrals", verifyToken, getReferredUsersController);
 router.get("/referrals/by", verifyToken, getReferredByController);
 router.get("/profile", verifyToken, getUserController);
+router.get('/organizers/:id', getOrganizerController);
 
 router.patch(
   "/",

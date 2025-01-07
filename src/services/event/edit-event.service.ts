@@ -15,7 +15,6 @@ interface EditEventBody {
   endDate: string;
   eventCategories: number[];
   ticketTypes: TicketType[];
-  bankAccount: string;
 }
 
 import { cloudinaryRemove, cloudinaryUpload } from "../../lib/cloudinary";
@@ -38,7 +37,6 @@ export const editEventService = async (
       endDate,
       eventCategories,
       ticketTypes,
-      bankAccount,
     } = body;
 
     const start = new Date(startDate);
@@ -98,7 +96,6 @@ export const editEventService = async (
           locationId,
           startDate: start,
           endDate: end,
-          bankAccount,
           ...(imageUrl && { image: imageUrl }),
         },
       });
