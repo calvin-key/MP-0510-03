@@ -5,9 +5,12 @@ import { generateUniqueCouponCode } from "../../lib/coupon";
 import { prisma } from "../../lib/prisma";
 
 export const registerService = async (body: User) => {
+export const registerService = async (body: User) => {
   try {
     const { fullName, email, password, referralCode, role } = body;
+    const { fullName, email, password, referralCode, role } = body;
 
+    // Check if email exists
     const existingUser = await prisma.user.findFirst({
       where: { email },
     });
@@ -29,15 +32,18 @@ export const registerService = async (body: User) => {
       if (!referrer) {
         throw new Error("Invalid referral code!");
         throw new Error("Invalid referral code!");
+        throw new Error("Invalid referral code!");
       }
     }
 
     const hashedPassword = await hashPassword(password);
     const userReferralCode = generateReferralCode();
 
+    // Set points expiry date to 3 months from now
     const pointsExpiryDate = new Date();
     pointsExpiryDate.setMonth(pointsExpiryDate.getMonth() + 3);
 
+    // Create new user
     const newUser = await prisma.user.create({
       data: {
         fullName,
@@ -45,13 +51,16 @@ export const registerService = async (body: User) => {
         password: hashedPassword,
         referralCode: userReferralCode,
         role,
+        role,
         phoneNumber: "",
         pointsBalance: 0,
         pointsExpiryDate,
       },
     });
 
+    // If user registered with referral code
     if (referrer) {
+      // Create referral history
       await prisma.referralHistory.create({
         data: {
           referrerId: referrer.id,
@@ -60,6 +69,7 @@ export const registerService = async (body: User) => {
         },
       });
 
+      // Add points to referrer
       await prisma.point.create({
         data: {
           userId: referrer.id,
@@ -68,6 +78,7 @@ export const registerService = async (body: User) => {
         },
       });
 
+      // Update referrer's points balance
       await prisma.user.update({
         where: { id: referrer.id },
         data: {
@@ -82,6 +93,7 @@ export const registerService = async (body: User) => {
 
       const couponCode = await generateUniqueCouponCode();
 
+
       const coupon = await prisma.coupon.create({
         data: {
           code: couponCode,
@@ -91,6 +103,7 @@ export const registerService = async (body: User) => {
         },
       });
 
+      // Create user-coupon relationship
       await prisma.userCoupon.create({
         data: {
           userId: newUser.id,

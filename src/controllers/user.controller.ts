@@ -4,6 +4,7 @@ import { updateUserService } from "../services/user/update-user.service";
 import { getReferredByService } from "../services/user/get-referred-by.service";
 import { getReferredUsersService } from "../services/user/get-users-referred";
 import { changePasswordService } from "../services/user/change-password.service";
+import { getOrganizerService } from "../services/user/get-organizer.service";
 
 export const getUserController = async (
   req: Request,
@@ -15,6 +16,29 @@ export const getUserController = async (
 
     const result = await getUserService(id);
     res.status(200).send(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getOrganizerController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const organizerId = parseInt(req.params.id);
+
+    if (isNaN(organizerId)) {
+      res.status(400).send({
+        status: "error",
+        message: "Invalid organizer ID",
+      });
+    }
+
+    const data = await getOrganizerService(organizerId);
+
+    res.status(200).send(data);
   } catch (error) {
     next(error);
   }

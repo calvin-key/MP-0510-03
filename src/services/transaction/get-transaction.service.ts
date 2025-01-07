@@ -23,6 +23,8 @@ export const getTransactionService = async (id: number) => {
             },
           },
         },
+        voucher: true,
+        coupon: true,
       },
     });
 

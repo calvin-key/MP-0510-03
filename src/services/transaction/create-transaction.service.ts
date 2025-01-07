@@ -20,7 +20,6 @@ export const createTransactionService = async (
     const { tickets, pointsUsed = 0, voucherId, couponId } = body;
 
     return await prisma.$transaction(async (tx) => {
-      // 1. Validate and get all ticket types
       const ticketTypes = await Promise.all(
         tickets.map(async (ticket) => {
           const ticketType = await tx.ticketType.findUnique({
@@ -42,13 +41,11 @@ export const createTransactionService = async (
         })
       );
 
-      // 2. Calculate total base price for all tickets
       const totalBasePrice = ticketTypes.reduce(
         (sum, ticket) => sum + ticket.price * ticket.requestedQuantity,
         0
       );
 
-      // 3. Handle voucher validation and discount
       let voucherDiscount = 0;
       if (voucherId) {
         const voucher = await tx.voucher.findUnique({
@@ -68,7 +65,6 @@ export const createTransactionService = async (
           throw new Error("Voucher usage limit reached.");
         }
 
-        // Check if user has already used this voucher
         const existingUsage = await tx.voucherUsage.findUnique({
           where: {
             userId_voucherId: {
@@ -95,13 +91,11 @@ export const createTransactionService = async (
 
         voucherDiscount = voucher.nominal;
 
-        // Update voucher usage
         await tx.voucher.update({
           where: { id: voucherId },
           data: { usageCount: { increment: 1 } },
         });
 
-        // Record voucher usage
         await tx.voucherUsage.create({
           data: {
             userId,
@@ -113,7 +107,6 @@ export const createTransactionService = async (
       let couponDiscount = 0;
 
       if (couponId) {
-        // Find user's coupon
         const userCoupon = await tx.userCoupon.findFirst({
           where: {
             userId,
@@ -135,14 +128,12 @@ export const createTransactionService = async (
 
         couponDiscount = userCoupon.coupon.nominal;
 
-        // Mark coupon as used
         await tx.userCoupon.update({
           where: { id: userCoupon.id },
           data: { isUsed: true },
         });
       }
 
-      // 4. Handle points validation and usage
       if (pointsUsed > 0) {
         const user = await tx.user.findUnique({
           where: { id: userId },
@@ -153,18 +144,15 @@ export const createTransactionService = async (
           throw new Error("Insufficient points balance.");
         }
 
-        // Update user's points balance
         await tx.user.update({
           where: { id: userId },
           data: { pointsBalance: { decrement: pointsUsed } },
         });
       }
 
-      // 5. Calculate final price
       const totalDiscount = pointsUsed + voucherDiscount + couponDiscount;
       const finalTotalPrice = Math.max(0, totalBasePrice - totalDiscount);
 
-      // 6. Create the main transaction
       const transaction = await tx.transaction.create({
         data: {
           userId,
@@ -187,7 +175,6 @@ export const createTransactionService = async (
         },
       });
 
-      // 7. Update ticket availabilities
       await Promise.all(
         ticketTypes.map((ticket) =>
           tx.ticketType.update({

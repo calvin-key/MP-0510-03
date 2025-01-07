@@ -8,6 +8,7 @@ import {
   updateTransactionController,
 } from "../controllers/transaction.controller";
 import { fileFilter } from "../lib/fileFilter";
+import { validateTransactionBody } from "../validators/transaction.validator";
 
 const router = express.Router();
 
@@ -17,8 +18,9 @@ router.post("/", verifyToken, createTransactionController);
 router.patch(
   "/:id",
   verifyToken,
-  uploader(5).fields([{ name: "paymentProof", maxCount: 10 }]), // Allow multiple files for paymentProof
-  fileFilter, // Ensure this is compatible with multiple files
+  uploader(5).fields([{ name: "paymentProof", maxCount: 10 }]),
+  fileFilter,
+  validateTransactionBody,
   updateTransactionController
 );
 

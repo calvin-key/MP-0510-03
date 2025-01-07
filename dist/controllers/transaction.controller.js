@@ -53,7 +53,10 @@ const updateTransactionController = (req, res, next) => __awaiter(void 0, void 0
         const userId = res.locals.user.id;
         const transactionId = parseInt(req.params.id);
         const files = req.files;
+<<<<<<< HEAD
         // Check if paymentProof file exists
+=======
+>>>>>>> main
         if (!((_a = files === null || files === void 0 ? void 0 : files.paymentProof) === null || _a === void 0 ? void 0 : _a[0])) {
             res.status(400).json({
                 status: "error",
