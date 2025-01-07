@@ -11,6 +11,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createVoucherController = void 0;
 const create_voucher_service_1 = require("../services/voucher/create-voucher.service");
+<<<<<<< HEAD
+const createVoucherController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const organizerId = Number(res.locals.user.id);
+        const voucher = yield (0, create_voucher_service_1.createVoucherService)(organizerId, req.body);
+        res.status(201).json({ message: "Voucher created successfully.", voucher });
+    }
+    catch (error) {
+        res.status(400).json({ message: error.message });
+=======
 const createVoucherController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const organizerId = Number(res.locals.user.id);
@@ -19,6 +29,7 @@ const createVoucherController = (req, res, next) => __awaiter(void 0, void 0, vo
     }
     catch (error) {
         next(error);
+>>>>>>> main
     }
 });
 exports.createVoucherController = createVoucherController;

@@ -15,6 +15,10 @@ const createTransactionService = (body, userId) => __awaiter(void 0, void 0, voi
     try {
         const { tickets, pointsUsed = 0, voucherId, couponId } = body;
         return yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+<<<<<<< HEAD
+            // 1. Validate and get all ticket types
+=======
+>>>>>>> main
             const ticketTypes = yield Promise.all(tickets.map((ticket) => __awaiter(void 0, void 0, void 0, function* () {
                 const ticketType = yield tx.ticketType.findUnique({
                     where: { id: ticket.ticketTypeId },
@@ -28,7 +32,13 @@ const createTransactionService = (body, userId) => __awaiter(void 0, void 0, voi
                 }
                 return Object.assign(Object.assign({}, ticketType), { requestedQuantity: ticket.quantity });
             })));
+<<<<<<< HEAD
+            // 2. Calculate total base price for all tickets
             const totalBasePrice = ticketTypes.reduce((sum, ticket) => sum + ticket.price * ticket.requestedQuantity, 0);
+            // 3. Handle voucher validation and discount
+=======
+            const totalBasePrice = ticketTypes.reduce((sum, ticket) => sum + ticket.price * ticket.requestedQuantity, 0);
+>>>>>>> main
             let voucherDiscount = 0;
             if (voucherId) {
                 const voucher = yield tx.voucher.findUnique({
@@ -44,6 +54,10 @@ const createTransactionService = (body, userId) => __awaiter(void 0, void 0, voi
                 if (voucher.usageCount >= voucher.quantity) {
                     throw new Error("Voucher usage limit reached.");
                 }
+<<<<<<< HEAD
+                // Check if user has already used this voucher
+=======
+>>>>>>> main
                 const existingUsage = yield tx.voucherUsage.findUnique({
                     where: {
                         userId_voucherId: {
@@ -61,10 +75,18 @@ const createTransactionService = (body, userId) => __awaiter(void 0, void 0, voi
                     throw new Error("Voucher is not valid for any of the selected events.");
                 }
                 voucherDiscount = voucher.nominal;
+<<<<<<< HEAD
+                // Update voucher usage
+=======
+>>>>>>> main
                 yield tx.voucher.update({
                     where: { id: voucherId },
                     data: { usageCount: { increment: 1 } },
                 });
+<<<<<<< HEAD
+                // Record voucher usage
+=======
+>>>>>>> main
                 yield tx.voucherUsage.create({
                     data: {
                         userId,
@@ -74,6 +96,10 @@ const createTransactionService = (body, userId) => __awaiter(void 0, void 0, voi
             }
             let couponDiscount = 0;
             if (couponId) {
+<<<<<<< HEAD
+                // Find user's coupon
+=======
+>>>>>>> main
                 const userCoupon = yield tx.userCoupon.findFirst({
                     where: {
                         userId,
@@ -91,11 +117,19 @@ const createTransactionService = (body, userId) => __awaiter(void 0, void 0, voi
                     throw new Error("Coupon has expired.");
                 }
                 couponDiscount = userCoupon.coupon.nominal;
+<<<<<<< HEAD
+                // Mark coupon as used
+=======
+>>>>>>> main
                 yield tx.userCoupon.update({
                     where: { id: userCoupon.id },
                     data: { isUsed: true },
                 });
             }
+<<<<<<< HEAD
+            // 4. Handle points validation and usage
+=======
+>>>>>>> main
             if (pointsUsed > 0) {
                 const user = yield tx.user.findUnique({
                     where: { id: userId },
@@ -104,13 +138,24 @@ const createTransactionService = (body, userId) => __awaiter(void 0, void 0, voi
                 if (!user || user.pointsBalance < pointsUsed) {
                     throw new Error("Insufficient points balance.");
                 }
+<<<<<<< HEAD
+                // Update user's points balance
+=======
+>>>>>>> main
                 yield tx.user.update({
                     where: { id: userId },
                     data: { pointsBalance: { decrement: pointsUsed } },
                 });
             }
+<<<<<<< HEAD
+            // 5. Calculate final price
             const totalDiscount = pointsUsed + voucherDiscount + couponDiscount;
             const finalTotalPrice = Math.max(0, totalBasePrice - totalDiscount);
+            // 6. Create the main transaction
+=======
+            const totalDiscount = pointsUsed + voucherDiscount + couponDiscount;
+            const finalTotalPrice = Math.max(0, totalBasePrice - totalDiscount);
+>>>>>>> main
             const transaction = yield tx.transaction.create({
                 data: {
                     userId,
@@ -132,6 +177,10 @@ const createTransactionService = (body, userId) => __awaiter(void 0, void 0, voi
                     items: true,
                 },
             });
+<<<<<<< HEAD
+            // 7. Update ticket availabilities
+=======
+>>>>>>> main
             yield Promise.all(ticketTypes.map((ticket) => tx.ticketType.update({
                 where: { id: ticket.id },
                 data: { availableSeats: { decrement: ticket.requestedQuantity } },

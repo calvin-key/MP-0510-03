@@ -14,7 +14,11 @@ const cloudinary_1 = require("../../lib/cloudinary");
 const prisma_1 = require("../../lib/prisma");
 const editEventService = (body, image, userId, eventId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+<<<<<<< HEAD
+        const { name, description, address, specificLocation, locationId, startDate, endDate, eventCategories, ticketTypes, bankAccount, } = body;
+=======
         const { name, description, address, specificLocation, locationId, startDate, endDate, eventCategories, ticketTypes, } = body;
+>>>>>>> main
         const start = new Date(startDate);
         const end = new Date(endDate);
         if (isNaN(start.getTime()) || isNaN(end.getTime())) {
@@ -60,7 +64,11 @@ const editEventService = (body, image, userId, eventId) => __awaiter(void 0, voi
                     description,
                     address,
                     specificLocation,
+<<<<<<< HEAD
+                    locationId, startDate: start, endDate: end, bankAccount }, (imageUrl && { image: imageUrl })),
+=======
                     locationId, startDate: start, endDate: end }, (imageUrl && { image: imageUrl })),
+>>>>>>> main
             });
             // Update event categories
             yield tx.eventCategory.deleteMany({
