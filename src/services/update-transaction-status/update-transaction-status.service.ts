@@ -1,5 +1,6 @@
 import { TransactionStatus } from "@prisma/client";
 import { prisma } from "../../lib/prisma";
+import { transporter } from "../../lib/nodemailer";
 
 export const updateTransactionStatusService = async (
   transactionId: number,
@@ -49,6 +50,15 @@ export const updateTransactionStatusService = async (
           },
         },
       },
+    });
+
+    transporter.sendMail({
+      to: transaction.user.email,
+      subject: "Your Ticket",
+      html: `
+        <h1>Thank you for your purchase!</h1>
+        <p>Transaction Status: ${transaction.status}</p>
+      `,
     });
 
     return transaction;
