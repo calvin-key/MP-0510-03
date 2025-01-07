@@ -81,9 +81,11 @@ export const editEventService = async (
         userId,
         locationId: location.id,
         ticketTypes: {
+          deleteMany: {},
           create: ticketTypes,
         },
         eventCategories: {
+          deleteMany: {},
           create: categoryRecords.map((category) => ({
             categoryId: category.id,
           })),
