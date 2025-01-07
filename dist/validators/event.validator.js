@@ -36,8 +36,13 @@ exports.validateCreateEvent = [
                 throw new Error("Ticket types must be an array");
             }
             parsed.forEach((ticket) => {
-                if (!ticket.ticketType || !ticket.price || !ticket.availableSeats) {
+                if (ticket.ticketType === undefined ||
+                    ticket.price === undefined ||
+                    ticket.availableSeats === undefined) {
                     throw new Error("Each ticket type must include ticketType, price, and availableSeats");
+                }
+                if (typeof ticket.price !== "number" || ticket.price < 0) {
+                    throw new Error("Ticket price must be a non-negative number");
                 }
             });
         }

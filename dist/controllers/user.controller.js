@@ -9,12 +9,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.changePasswordController = exports.updateUserController = exports.getReferredUsersController = exports.getReferredByController = exports.getUserController = void 0;
+exports.changePasswordController = exports.updateUserController = exports.getReferredUsersController = exports.getReferredByController = exports.getOrganizerController = exports.getUserController = void 0;
 const get_user_service_1 = require("../services/user/get-user.service");
 const update_user_service_1 = require("../services/user/update-user.service");
 const get_referred_by_service_1 = require("../services/user/get-referred-by.service");
 const get_users_referred_1 = require("../services/user/get-users-referred");
 const change_password_service_1 = require("../services/user/change-password.service");
+const get_organizer_service_1 = require("../services/user/get-organizer.service");
 const getUserController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const id = Number(res.locals.user.id);
@@ -26,6 +27,23 @@ const getUserController = (req, res, next) => __awaiter(void 0, void 0, void 0, 
     }
 });
 exports.getUserController = getUserController;
+const getOrganizerController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const organizerId = parseInt(req.params.id);
+        if (isNaN(organizerId)) {
+            res.status(400).send({
+                status: "error",
+                message: "Invalid organizer ID",
+            });
+        }
+        const data = yield (0, get_organizer_service_1.getOrganizerService)(organizerId);
+        res.status(200).send(data);
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.getOrganizerController = getOrganizerController;
 const getReferredByController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const result = yield (0, get_referred_by_service_1.getReferredByService)(res.locals.user.id);

@@ -34,6 +34,8 @@ const getTransactionService = (id) => __awaiter(void 0, void 0, void 0, function
                         },
                     },
                 },
+                voucher: true,
+                coupon: true,
             },
         });
         if (!transaction) {
