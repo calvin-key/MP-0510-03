@@ -118,7 +118,6 @@ model Event {
   description      String          @db.Text
   organizer        User            @relation(fields: [userId], references: [id])
   address          String
-  bankAccount      String?
   specificLocation String
   locationId       Int
   location         Location        @relation(fields: [locationId], references: [id])
