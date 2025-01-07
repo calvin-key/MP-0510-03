@@ -1,0 +1,16 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const event_controller_1 = require("../controllers/event.controller");
+const multer_1 = require("../lib/multer");
+const fileFilter_1 = require("../lib/fileFilter");
+const event_validator_1 = require("../validators/event.validator");
+const jwt_1 = require("../lib/jwt");
+const router = (0, express_1.Router)();
+router.get("/reviewable", jwt_1.verifyToken, event_controller_1.getReviewableEventsController);
+router.get("/organizer", jwt_1.verifyToken, event_controller_1.getOrganizerEventsController);
+router.get("/", event_controller_1.getEventsController);
+router.get("/:id", event_controller_1.getEventController);
+router.post("/", jwt_1.verifyToken, (0, multer_1.uploader)(5).fields([{ name: "image", maxCount: 1 }]), fileFilter_1.fileFilter, event_validator_1.validateCreateEvent, event_controller_1.createEventController);
+router.patch("/:id", jwt_1.verifyToken, (0, multer_1.uploader)().fields([{ name: "image", maxCount: 1 }]), fileFilter_1.fileFilter, event_validator_1.validateCreateEvent, event_controller_1.editEventController);
+exports.default = router;

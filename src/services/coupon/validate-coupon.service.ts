@@ -4,7 +4,7 @@ export const validateCouponService = async (code: string, userId: number) => {
   try {
     // First check if coupon exists
     const coupon = await prisma.coupon.findFirst({
-      where: { code }
+      where: { code },
     });
 
     if (!coupon) {
@@ -23,8 +23,8 @@ export const validateCouponService = async (code: string, userId: number) => {
         couponId: coupon.id,
       },
       include: {
-        coupon: true
-      }
+        coupon: true,
+      },
     });
 
     if (!userCoupon) {
@@ -39,7 +39,7 @@ export const validateCouponService = async (code: string, userId: number) => {
     return {
       id: userCoupon.couponId,
       code: userCoupon.coupon.code,
-      nominal: userCoupon.coupon.nominal
+      nominal: userCoupon.coupon.nominal,
     };
   } catch (error) {
     throw error;

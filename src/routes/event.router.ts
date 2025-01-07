@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   createEventController,
+  editEventController,
   getEventController,
   getEventsController,
   getOrganizerEventsController,
@@ -24,6 +25,15 @@ router.post(
   fileFilter,
   validateCreateEvent,
   createEventController
+);
+
+router.patch(
+  "/:id",
+  verifyToken,
+  uploader().fields([{ name: "image", maxCount: 1 }]),
+  fileFilter,
+  validateCreateEvent,
+  editEventController
 );
 
 export default router;

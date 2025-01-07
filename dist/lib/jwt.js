@@ -15,7 +15,7 @@ const verifyToken = (req, res, next) => {
     (0, jsonwebtoken_1.verify)(token, config_1.JWT_SECRET, (err, payload) => {
         if (err) {
             if (err instanceof jsonwebtoken_1.TokenExpiredError) {
-                res.status(401).send({ message: "Token Expoired" });
+                res.status(401).send({ message: "Token Expired" });
                 return;
             }
             else {

@@ -3,9 +3,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.validateResetPassword = exports.validateForgotPassword = exports.validateLogin = exports.validateRegister = void 0;
 const express_validator_1 = require("express-validator");
 exports.validateRegister = [
-    (0, express_validator_1.body)("fullName").notEmpty().withMessage("First name is required").isString(),
+    (0, express_validator_1.body)("fullName").notEmpty().withMessage("Full name is required").isString(),
     (0, express_validator_1.body)("email").notEmpty().withMessage("Email is required").isEmail(),
     (0, express_validator_1.body)("password").notEmpty().withMessage("Password is required"),
+    (0, express_validator_1.body)("role")
+        .optional()
+        .isIn(["CUSTOMER", "ORGANIZER", "customer", "organizer"])
+        .withMessage("Invalid role"),
+    (0, express_validator_1.body)("referralCode").optional().isString(),
     (req, res, next) => {
         const errors = (0, express_validator_1.validationResult)(req);
         if (!errors.isEmpty()) {
