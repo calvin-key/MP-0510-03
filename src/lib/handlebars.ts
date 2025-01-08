@@ -40,7 +40,7 @@ export const sendNotificationEmail = async (data: {
   const template = handlebars.compile(notificationTransactionTemplate);
 
   const html = template({
-    email,
+    status,
   });
 
   const mailOptions = {
