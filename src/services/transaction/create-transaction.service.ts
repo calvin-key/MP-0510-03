@@ -160,7 +160,8 @@ export const createTransactionService = async (
           voucherId,
           couponId,
           totalPrice: finalTotalPrice,
-          expiresAt: new Date(Date.now() + 2 * 60 * 60 * 1000), // 2-hour expiration
+          expiresAt: new Date(Date.now() + 2 * 60 *  1000), // 2-hour expiration
+          // expiresAt: new Date(Date.now() + 2 * 60 * 60 * 1000), // 2-hour expiration
           items: {
             create: ticketTypes.map((ticket) => ({
               ticketTypeId: ticket.id,
@@ -184,9 +185,12 @@ export const createTransactionService = async (
         )
       );
 
+
+
       return transaction;
     });
   } catch (error) {
     throw error;
   }
 };
+
