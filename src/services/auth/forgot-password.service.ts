@@ -3,6 +3,7 @@ import { sign } from "jsonwebtoken";
 import { BASE_URL_FE, JWT_SECRET_FORGOT_PASSWORD } from "../../config";
 import { transporter } from "../../lib/nodemailer";
 import { prisma } from "../../lib/prisma";
+import { sendForgotPasswordEmail } from "../../lib/handlebars";
 
 export const forgotPasswordService = async (body: Pick<User, "email">) => {
   try {
@@ -21,11 +22,7 @@ export const forgotPasswordService = async (body: Pick<User, "email">) => {
 
     const link = `${BASE_URL_FE}/reset-password/${token}`;
 
-    transporter.sendMail({
-      to: email,
-      subject: "You Can Reset Password in Here",
-      html: `<a href="${link}" target="_blank">You Can Reset Password in Here</a>`,
-    });
+    await sendForgotPasswordEmail({ email, link });
 
     return { message: "Send email success" };
   } catch (error) {
