@@ -2,6 +2,7 @@ import handlebars from "handlebars";
 import { transporter } from "./nodemailer";
 import { forgotPasswordTemplate } from "../templates/ForgotPassword";
 import { notificationTransactionTemplate } from "../templates/NotificationTransaction";
+import { notificationTransactionTemplate } from "../templates/NotificationTransaction";
 
 export const sendForgotPasswordEmail = async (data: {
   email: string;
